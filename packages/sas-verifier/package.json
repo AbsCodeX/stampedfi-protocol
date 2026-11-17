@@ -1,0 +1,28 @@
+{
+  "name": "@stampedfi/sas-verifier",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Zero-bloat Ed25519 verifier SDK for stamped-sas-v1 safety attestations, Zero-Dox holder tier receipts (stamped-tier-v1), Seeker SGT receipts (stamped-sgt-v1), and Solana Actions Blink guards by STAMPED Labs, Inc.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stampedfi/stampedfi-protocol.git"
+  },
+  "homepage": "https://stampedfi.io",
+  "dependencies": {
+    "bs58": "^6.0.0",
+    "tweetnacl": "^1.0.3",
+    "zod": "^4.6.7"
+  }
+}

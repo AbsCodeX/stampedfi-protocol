@@ -1,0 +1,21 @@
+{
+  "name": "stampedfi-protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "STAMPED Labs, Inc. open-source MIT public goods: @stampedfi/sas-verifier and @stampedfi/mcp",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --ws",
+    "test": "vitest run",
+    "typecheck": "npm run build --ws"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

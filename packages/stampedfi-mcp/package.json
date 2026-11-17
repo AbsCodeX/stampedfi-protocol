@@ -1,0 +1,28 @@
+{
+  "name": "@stampedfi/mcp",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Official Model Context Protocol (MCP) server for StampedFi Trust & Signal Protocol — verify Solana token safety, query Seeker SGT human theses, validate Zero-Dox holder receipts, and build Stamp Shield guarded swaps.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "stampedfi-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stampedfi/stampedfi-protocol.git"
+  },
+  "homepage": "https://stampedfi.io",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@solana/kit": "^8.5.0",
+    "@stampedfi/sas-verifier": "0.1.0",
+    "bs58": "^6.0.0",
+    "tweetnacl": "^1.0.3",
+    "zod": "^4.6.7"
+  }
+}
