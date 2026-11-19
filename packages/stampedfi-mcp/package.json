@@ -14,9 +14,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/stampedfi/stampedfi-protocol.git"
+    "url": "https://github.com/AbsCodeX/stampedfi-protocol.git"
   },
-  "homepage": "https://stampedfi.io",
+  "homepage": "https://stampedfi.com",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
     "@solana/kit": "^8.5.0",

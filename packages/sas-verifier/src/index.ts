@@ -2,7 +2,7 @@
  * @stampedfi/sas-verifier — Official MIT Open-Source Cryptographic Verifier SDK by STAMPED Labs, Inc.
  *
  * Verifies in <1ms offline (zero RPC calls, zero proprietary backend secrets):
- * 1. `stamped-sas-v1` (and backward-compatible `pippop-sas-v1`) Solana token safety attestations
+ * 1. `stamped-sas-v1` Solana token safety attestations
  * 2. `stamped-tier-v1` Zero-Dox holder tier receipts (Shrimp / Dolphin / Shark / Whale)
  * 3. `stamped-sgt-v1` Solana Mobile Seeker Genesis Token Hardware-Human badges
  * 4. `guardSolanaBlinkUrl` Solana Actions / Blink URL pre-execution safety gate
@@ -12,14 +12,13 @@ import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 
 export const SAS_SCHEMA = 'stamped-sas-v1' as const;
-export const LEGACY_SAS_SCHEMA = 'pippop-sas-v1' as const;
 export const TIER_SCHEMA = 'stamped-tier-v1' as const;
 export const SGT_SCHEMA = 'stamped-sgt-v1' as const;
 export const SIGNATURE_SCHEME = 'ed25519-v1' as const;
 export const SEEKER_SGT_GROUP_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te' as const;
 
 export type SafetyLevel = 'ok' | 'caution' | 'risky' | 'blocked' | 'unknown';
-export type SasSchema = typeof SAS_SCHEMA | typeof LEGACY_SAS_SCHEMA;
+export type SasSchema = typeof SAS_SCHEMA;
 export type HolderTier = 'Shrimp' | 'Dolphin' | 'Shark' | 'Whale';
 
 export interface SafetyAttestation {
@@ -79,7 +78,7 @@ export interface SignedSgtReceipt extends SgtReceipt {
   signatureScheme: typeof SIGNATURE_SCHEME;
 }
 
-const ALLOWED_SAS_SCHEMAS: readonly string[] = [SAS_SCHEMA, LEGACY_SAS_SCHEMA];
+const ALLOWED_SAS_SCHEMAS: readonly string[] = [SAS_SCHEMA];
 const LEVELS: readonly SafetyLevel[] = ['ok', 'caution', 'risky', 'blocked', 'unknown'];
 const TIER_SPECS: Record<HolderTier, { minUsd: number; label: string }> = {
   Shrimp: { minUsd: 5, label: 'Shrimp ($5-$100)' },

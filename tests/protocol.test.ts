@@ -3,7 +3,6 @@ import { createHash } from 'node:crypto';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import {
-  LEGACY_SAS_SCHEMA,
   SAS_SCHEMA,
   SEEKER_SGT_GROUP_ADDRESS,
   SGT_SCHEMA,
@@ -68,20 +67,13 @@ describe('@stampedfi/sas-verifier', () => {
     expect(verifySignedSafetyAttestation(signed, '11111111111111111111111111111111')).toBe(false);
   });
 
-  it('maintains backward-compatibility with legacy pippop-sas-v1 records', () => {
+  it('strictly enforces canonical stamped-sas-v1 schema pinning', () => {
     const base = sampleAttestation('caution');
-    const legacy: SafetyAttestation = {
+    const wrongSchema = {
       ...base,
-      schema: LEGACY_SAS_SCHEMA,
-      digestHex: attestationDigest({
-        schema: LEGACY_SAS_SCHEMA,
-        mint: base.mint,
-        level: base.level,
-        coverageBps: base.coverageBps,
-        flagIds: base.flagIds,
-      }),
+      schema: 'unknown-sas-v0' as unknown as SafetyAttestation['schema'],
     };
-    expect(verifySafetyAttestationDigest(legacy)).toBe(true);
+    expect(verifySafetyAttestationDigest(wrongSchema)).toBe(false);
   });
 
   it('verifies Zero-Dox stamped-tier-v1 and Seeker stamped-sgt-v1 Ed25519 receipts', () => {
@@ -182,14 +174,14 @@ describe('@stampedfi/sas-verifier', () => {
     const okSigned = signSafetyAttestation(sampleAttestation('ok'), SEED_HEX);
     const blockedSigned = signSafetyAttestation(sampleAttestation('blocked'), SEED_HEX);
 
-    expect(guardSolanaBlinkUrl(`solana-action:https://stampedfi.com/api/actions/pop/${BONK_MINT}`, okSigned, ISSUER_PUBKEY)).toMatchObject({
+    expect(guardSolanaBlinkUrl(`solana-action:https://stampedfi.com/api/actions/stamp/${BONK_MINT}`, okSigned, ISSUER_PUBKEY)).toMatchObject({
       allowed: true,
       extractedMint: BONK_MINT,
     });
-    expect(guardSolanaBlinkUrl(`solana-action:http://evil.example/pop/${BONK_MINT}`)).toMatchObject({
+    expect(guardSolanaBlinkUrl(`solana-action:http://evil.example/stamp/${BONK_MINT}`)).toMatchObject({
       allowed: false,
     });
-    expect(guardSolanaBlinkUrl(`https://dial.to/?action=solana-action%3Ahttps%3A%2F%2Fstampedfi.com%2Fapi%2Factions%2Fpop%2F${BONK_MINT}`, blockedSigned, ISSUER_PUBKEY)).toMatchObject({
+    expect(guardSolanaBlinkUrl(`https://dial.to/?action=solana-action%3Ahttps%3A%2F%2Fstampedfi.com%2Fapi%2Factions%2Fstamp%2F${BONK_MINT}`, blockedSigned, ISSUER_PUBKEY)).toMatchObject({
       allowed: false,
     });
   });

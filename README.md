@@ -1,11 +1,14 @@
 # StampedFi Trust & Signal Protocol (`stampedfi-protocol`)
 
+[![CI](https://github.com/AbsCodeX/stampedfi-protocol/actions/workflows/ci.yml/badge.svg)](https://github.com/AbsCodeX/stampedfi-protocol/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-1D9E5E.svg)](./LICENSE)
+
 | Executive Field | Verified Specification |
 | :--- | :--- |
 | **Issuer & Maintainer** | **STAMPED Labs, Inc.** · Founder & Managing Director: Abigail Stafford (`founders@stampedfi.com`) |
 | **License & IP Boundary** | `MIT` Public Goods SDK & MCP Server (Zero proprietary backend scoring rules or routing weights) |
-| **Packages** | `@stampedfi/sas-verifier` ([index.ts](file:///Users/astafford/Projects/stampedfi-protocol/packages/sas-verifier/src/index.ts)) · `@stampedfi/mcp` ([index.ts](file:///Users/astafford/Projects/stampedfi-protocol/packages/stampedfi-mcp/src/index.ts)) |
-| **Supported Schemas** | `stamped-sas-v1` (with `pippop-sas-v1` compatibility) · `stamped-tier-v1` · `stamped-sgt-v1` · `x402-v1` |
+| **Packages** | `@stampedfi/sas-verifier` ([src/index.ts](./packages/sas-verifier/src/index.ts)) · `@stampedfi/mcp` ([src/index.ts](./packages/stampedfi-mcp/src/index.ts)) |
+| **Supported Schemas** | `stamped-sas-v1` · `stamped-tier-v1` · `stamped-sgt-v1` · `x402-v1` |
 | **Solana Stack** | `@solana/kit` `8.6.0` · `@modelcontextprotocol/sdk` `1.32.2` · `tweetnacl` Ed25519 (`<1ms` offline) |
 
 **Quick Navigation:**
