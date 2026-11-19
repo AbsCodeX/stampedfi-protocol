@@ -5,7 +5,7 @@
 
 | Executive Field | Verified Specification |
 | :--- | :--- |
-| **Issuer & Maintainer** | **STAMPED Labs, Inc.** · Founder & Managing Director: Abigail Stafford (`founders@stampedfi.com`) |
+| **Issuer & Maintainer** | **STAMPED Labs, Inc.** (`@stampedfi` · `founders@stampedfi.com`) |
 | **License & IP Boundary** | `MIT` Public Goods SDK & MCP Server (Zero proprietary backend scoring rules or routing weights) |
 | **Packages** | `@stampedfi/sas-verifier` ([src/index.ts](./packages/sas-verifier/src/index.ts)) · `@stampedfi/mcp` ([src/index.ts](./packages/stampedfi-mcp/src/index.ts)) |
 | **Supported Schemas** | `stamped-sas-v1` · `stamped-tier-v1` · `stamped-sgt-v1` · `x402-v1` |
