@@ -1,0 +1,13 @@
+[package]
+name = "stamped_gifts"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "StampedFi Gift-a-Stamp V2 On-Chain Escrow Program — 1-to-1 isolated per-gift PDA vaults with atomic SPL/Token-2022 claim, cancel release, and 100% rent recovery to sponsor."
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+pinocchio = "0.8"
+pinocchio-system = "0.2"
