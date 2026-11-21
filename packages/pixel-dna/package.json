@@ -1,0 +1,23 @@
+{
+  "name": "@stampedfi/pixel-dna",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "StampedFi Pixel-DNA Living Seal — compression-survivable invisible Haar/DCT luminance watermark and 64-bit perceptual hash engine for anti-Photoshop screenshot auditing by STAMPED Labs, Inc.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AbsCodeX/stampedfi-protocol.git"
+  },
+  "homepage": "https://stampedfi.com"
+}

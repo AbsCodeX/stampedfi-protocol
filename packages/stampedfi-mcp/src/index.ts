@@ -4,10 +4,11 @@
  *
  * Equips AI coding and trading agents (Claude Desktop, Cursor, Antigravity, ElizaOS, SendAI) with:
  * 1. `stamped_verify_token_safety` — Offline Ed25519 + SHA-256 verification of `stamped-sas-v1` verdicts
- * 2. `stamped_get_icm_assets` — 24/7 Equities (Sunrise/xStocks), Kalshi Predictions, Yield (Lulo/Sanctum) & DePIN
- * 3. `stamped_get_verified_theses` — Solana `x402-v1` machine-payable signal feed ($0.01 USDC or free preview)
- * 4. `stamped_verify_holder_tier` — Offline verification of Zero-Dox `stamped-tier-v1` Whale/Shark/Dolphin/Shrimp proofs
- * 5. `stamped_compute_stamp_shield` — Deterministic BigInt Auto-2x House Money & StampScore (0-1000) calculator
+ * 2. `stamped_verify_call_stamp` — Fetch and cryptographically verify `stamped-call-v1` conviction stamps + live Zero-Dox holder state
+ * 3. `stamped_get_icm_assets` — 24/7 Equities (Sunrise/xStocks), Kalshi Predictions, Yield (Lulo/Sanctum) & DePIN
+ * 4. `stamped_get_verified_theses` — Solana `x402-v1` machine-payable signal feed ($0.01 USDC or free preview)
+ * 5. `stamped_verify_holder_tier` — Offline verification of Zero-Dox `stamped-tier-v1` Whale/Shark/Dolphin/Shrimp proofs
+ * 6. `stamped_compute_stamp_shield` — Deterministic BigInt Auto-2x House Money calculator
  */
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -16,10 +17,12 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { isAddress } from '@solana/kit';
 import { z } from 'zod';
 import {
-  verifySafetyAttestationDigest,
+  verifySignedCallStamp,
+  verifySignedCallerPassport,
   verifySignedSafetyAttestation,
   verifySignedTierReceipt,
-  type SafetyAttestation,
+  type SignedCallStamp,
+  type SignedCallerPassport,
   type SignedSafetyAttestation,
   type SignedTierReceipt,
 } from '@stampedfi/sas-verifier';
@@ -82,16 +85,65 @@ export function createStampedMcpTools(opts: StampedMcpOptions = {}) {
       if (!res.ok) {
         throw new Error(`StampedFi safety endpoint returned HTTP ${res.status}`);
       }
-      const payload = (await res.json()) as SafetyAttestation | SignedSafetyAttestation;
-      const isSigned = 'signatureBase58' in payload;
+      const payload = (await res.json()) as SignedSafetyAttestation;
+      const isSigned = typeof payload?.signatureBase58 === 'string' && payload.signatureBase58.length > 0;
+      // Fail closed: require valid Ed25519 signature + unexpired TTL
       const verified = isSigned
-        ? verifySignedSafetyAttestation(payload, expectedIssuer)
-        : verifySafetyAttestationDigest(payload);
+        ? verifySignedSafetyAttestation(payload, { expectedIssuerPubkey: expectedIssuer })
+        : false;
 
       return {
         verified,
-        cryptographicMode: isSigned ? 'ed25519-v1' : 'sha256-digest',
+        cryptographicMode: isSigned ? 'ed25519-v1' : 'unsigned-rejected',
         attestation: payload,
+      };
+    },
+
+    async verifyCallStamp(stampIdOrUuid: string) {
+      const clean = stampIdOrUuid.trim();
+      if (!/^[0-9A-Za-z-]{8,36}$/.test(clean)) {
+        throw new Error(`Invalid StampedFi stamp identifier: ${stampIdOrUuid}`);
+      }
+      const res = await fetchFn(`${baseUrl}/api/verify/stamp/${encodeURIComponent(clean)}`, {
+        headers: { accept: 'application/json' },
+      });
+      if (!res.ok) {
+        throw new Error(`StampedFi verify stamp endpoint returned HTTP ${res.status}`);
+      }
+      const body = (await res.json()) as {
+        stamp?: SignedCallStamp;
+        liveHolder?: { status: string; checkedAt: string };
+        receipt?: unknown;
+      };
+      const verified = Boolean(body.stamp && verifySignedCallStamp(body.stamp, { expectedIssuerPubkey: expectedIssuer }));
+      return {
+        verified,
+        cryptographicMode: verified ? 'ed25519-v1' : 'invalid',
+        stamp: body.stamp ?? null,
+        liveHolder: body.liveHolder ?? null,
+        receipt: body.receipt ?? null,
+      };
+    },
+
+    async getCallerPassport(handle: string) {
+      const clean = handle.trim().replace(/^@/, '');
+      if (!/^[0-9A-Za-z_.-]{1,40}$/.test(clean)) {
+        throw new Error(`Invalid caller handle: ${handle}`);
+      }
+      const res = await fetchFn(`${baseUrl}/api/verify/caller/${encodeURIComponent(clean)}`, {
+        headers: { accept: 'application/json' },
+      });
+      if (!res.ok) {
+        throw new Error(`StampedFi caller passport endpoint returned HTTP ${res.status}`);
+      }
+      const body = (await res.json()) as { passport?: SignedCallerPassport; verified?: boolean };
+      const verified = Boolean(
+        body.passport && verifySignedCallerPassport(body.passport, { expectedIssuerPubkey: expectedIssuer })
+      );
+      return {
+        verified,
+        cryptographicMode: verified ? 'ed25519-v1' : 'invalid',
+        passport: body.passport ?? null,
       };
     },
 
@@ -117,7 +169,7 @@ export function createStampedMcpTools(opts: StampedMcpOptions = {}) {
     },
 
     verifyHolderTier(receipt: SignedTierReceipt, issuerPubkey?: string) {
-      const valid = verifySignedTierReceipt(receipt, issuerPubkey ?? expectedIssuer);
+      const valid = verifySignedTierReceipt(receipt, { expectedIssuerPubkey: issuerPubkey ?? expectedIssuer });
       return {
         valid,
         tier: valid ? receipt.tier : null,
@@ -133,7 +185,7 @@ export function createStampedMcpServer(opts: StampedMcpOptions = {}): McpServer 
   const tools = createStampedMcpTools(opts);
   const server = new McpServer({
     name: '@stampedfi/mcp',
-    version: '0.1.0',
+    version: '0.2.0',
   });
 
   server.tool(
@@ -142,6 +194,26 @@ export function createStampedMcpServer(opts: StampedMcpOptions = {}): McpServer 
     { mint: z.string().min(32).max(44).describe('Solana SPL / Token-2022 mint address in Base58') },
     async ({ mint }) => {
       const out = await tools.verifyTokenSafety(mint);
+      return { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] };
+    }
+  );
+
+  server.tool(
+    'stamped_verify_call_stamp',
+    'Fetch and cryptographically verify a StampedFi stamped-call-v1 conviction card proof + Zero-Dox live holder status by 8-char short code or call UUID.',
+    { stampId: z.string().min(8).max(36).describe('8-char Base62 short code (e.g. k9X2mP4q) or Call UUID') },
+    async ({ stampId }) => {
+      const out = await tools.verifyCallStamp(stampId);
+      return { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] };
+    }
+  );
+
+  server.tool(
+    'stamped_get_caller_passport',
+    'Fetch and offline-verify a caller’s audited StampScore (0-1000) & SAS Tokenized Caller Passport (stamped-passport-v1).',
+    { handle: z.string().min(1).max(40).describe('Caller handle on StampedFi (with or without leading @)') },
+    async ({ handle }) => {
+      const out = await tools.getCallerPassport(handle);
       return { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] };
     }
   );

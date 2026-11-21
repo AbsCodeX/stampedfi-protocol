@@ -1,0 +1,13 @@
+[package]
+name = "stamped_protocol"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "StampedFi Proof-of-Conviction Protocol (STP-1) — Solana Transaction v1 atomic conviction stamping, CardGenomeV1 registry, Merkle batch anchoring, and live holder-status oracle by STAMPED Labs, Inc."
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+pinocchio = "0.8"
+pinocchio-system = "0.2"
