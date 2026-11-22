@@ -84,6 +84,12 @@ impl From<GiftProgramError> for ProgramError {
 #[cfg(not(test))]
 entrypoint!(process_instruction);
 
+#[cfg(all(not(test), any(target_os = "solana", target_arch = "bpf")))]
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
+}
+
 pub fn process_instruction(
     program_id: &Pubkey,
     accounts: &[AccountInfo],

@@ -8,7 +8,7 @@
 //!   2 = AnchorMerkleBatch:  anchors an hourly Merkle root of off-chain Ed25519 stamped-call-v1 digests permanently on L1
 //!   3 = UpdateHolderStatus: authorized heartbeat oracle records cross-DEX holding / Stamp Shield 2x / dump transitions
 
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 use pinocchio::{
     account_info::AccountInfo,
@@ -92,7 +92,14 @@ impl From<StampedError> for ProgramError {
     }
 }
 
+#[cfg(not(test))]
 entrypoint!(process_instruction);
+
+#[cfg(all(not(test), any(target_os = "solana", target_arch = "bpf")))]
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
+}
 
 pub fn process_instruction(
     program_id: &Pubkey,

@@ -8,6 +8,9 @@ description = "StampedFi Gift-a-Stamp V2 On-Chain Escrow Program — 1-to-1 isol
 [lib]
 crate-type = ["cdylib", "lib"]
 
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(target_os, values("solana"))'] }
+
 [dependencies]
 pinocchio = "0.8"
 pinocchio-system = "0.2"

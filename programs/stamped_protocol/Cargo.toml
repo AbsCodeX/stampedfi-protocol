@@ -8,6 +8,9 @@ description = "StampedFi Proof-of-Conviction Protocol (STP-1) — Solana Transac
 [lib]
 crate-type = ["cdylib", "lib"]
 
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(target_os, values("solana"))'] }
+
 [dependencies]
 pinocchio = "0.8"
 pinocchio-system = "0.2"
